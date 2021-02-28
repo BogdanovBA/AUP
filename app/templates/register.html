@@ -1,0 +1,51 @@
+{% extends 'base_card.html' %}
+
+{% block title %}New User Registration{% endblock %}
+
+
+{% block card_header %}
+    <h3>New User Registration</h3>
+{% endblock %}
+
+{% block card_body %}
+    <p>You can register using following form:</p>
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32)}}<br>
+            {% for error in form.username.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=32)}}<br>
+            {% for error in form.email.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32)}}<br>
+            {% for error in form.password.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password_again.label }}<br>
+            {{ form.password_again(size=32)}}<br>
+            {% for error in form.password_again.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <button type="submit" class="btn btn-outline-primary">Register</button>
+    </form>
+{% endblock %}
+
+{% block card_footer %}
+    <span>
+        Already have an account? Try to <a href="{{ url_for('login') }}">log in</a> .
+    </span>
+{% endblock %}

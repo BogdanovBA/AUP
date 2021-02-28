@@ -1,0 +1,14 @@
+{% extends 'base_card.html' %}
+
+{% block title %}Log out{% endblock %}
+
+{% block card_header %}
+    <h3>Log out</h3>
+{% endblock %}
+
+{% block card_body %}
+    <h3>Confirm your log out as {{ current_user.username }}</h3>
+    <form action="" method="POST">
+        <button type="submit" class="btn btn-outline-danger">Log Out</button>
+    </form>
+{% endblock %}
