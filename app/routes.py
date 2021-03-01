@@ -18,12 +18,6 @@ def save_picture(form_picture):
     return picture_filename
 
 
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('homepage.html')
-
-
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def account():
@@ -46,7 +40,7 @@ def account():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('account'))
     form = RegistrationForm()
     if request.method =='POST' and not form.validate():
         flash('Invalid credentials. Try again')
@@ -64,13 +58,13 @@ def register():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('account'))
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -82,6 +76,6 @@ def login():
         
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc !='':
-            next_page = url_for('home')
+            next_page = url_for('login')
         return redirect(next_page)
     return render_template("login.html", form=form)
