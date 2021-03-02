@@ -1,4 +1,4 @@
-from app.forms import LoginForm, RegistrationForm, UpdateAccountForm
+from app.forms import LoginForm, RegistrationForm, UpdateAccountForm, PasswordChangeForm
 from flask import redirect, url_for, render_template, flash, request
 from app import app, db
 from flask_login import login_user, current_user, logout_user, login_required
@@ -22,6 +22,9 @@ def save_picture(form_picture):
 @login_required
 def account():
     form = UpdateAccountForm(obj=current_user)
+    if request.method == 'POST' and not form.validate_on_submit():
+        flash('Error while profile updating')
+        return redirect(url_for('account'))
     if request.method == "POST" and form.validate_on_submit():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
@@ -29,7 +32,7 @@ def account():
         current_user.username = form.username.data 
         current_user.email = form.email.data 
         db.session.commit()
-        flash('Your account info successfully updated!', 'success')
+        flash('Profile updated successfully', 'success')
         return redirect(url_for('account'))
 
     image_file = url_for('static', filename='media/' + current_user.image_file)
@@ -55,12 +58,15 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    logout_user()
-    return redirect(url_for('login'))
+    if request.method == 'POST':
+        logout_user()
+        return redirect(url_for('login'))
+    return render_template('logout.html')
 
 
+@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -76,6 +82,25 @@ def login():
         
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc !='':
-            next_page = url_for('login')
+            next_page = url_for('account')
         return redirect(next_page)
     return render_template("login.html", form=form)
+
+
+@app.route('/password/change', methods=['GET', 'POST'])
+@login_required
+def password_change():
+    form = PasswordChangeForm()
+    if request.method == 'POST' and form.validate():
+        if not current_user.check_password(form.old_password.data):
+            flash('Old password is wrong')
+            return redirect(url_for('password_change'))
+        current_user.set_password(form.new_password.data)
+        db.session.commit()
+        flash('Password was changed')
+        return redirect(url_for('password_changed'))
+    return render_template('password.html', form=form)
+
+@app.route('/password/change/done')
+def password_changed():
+    return render_template('password_changed.html')

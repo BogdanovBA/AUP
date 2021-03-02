@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField(label='Account avatar', validators=[FileAllowed(['jpg', 'png'])])
+    picture = FileField(label='Account avatar', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'svg'])])
     submit = SubmitField('Update')
 
     def validate_username(self, username):
@@ -50,3 +50,9 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email is taken. Please choose a different one.')
+
+
+class PasswordChangeForm(FlaskForm):
+    old_password = PasswordField('Old password', validators=[DataRequired()])
+    new_password = PasswordField('New password', validators=[DataRequired()])
+    new_password_again = PasswordField('Repeat new password', validators=[DataRequired(), EqualTo('new_password')])
